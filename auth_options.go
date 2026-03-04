@@ -93,6 +93,27 @@ type AuthOptions struct {
 	ApplicationCredentialID     string `json:"-"`
 	ApplicationCredentialName   string `json:"-"`
 	ApplicationCredentialSecret string `json:"-"`
+
+	// IdentityProvider is the name of the identity provider for federated auth
+	IdentityProvider string `json:"-"`
+
+	// Protocol is the federation protocol (e.g., "openid")
+	Protocol string `json:"-"`
+
+	// DiscoveryEndpoint is the OIDC discovery endpoint
+	DiscoveryEndpoint string `json:"-"`
+
+	// ClientID is the OIDC client ID
+	ClientID string `json:"-"`
+
+	// ClientSecret is the OIDC client secret
+	ClientSecret string `json:"-"`
+
+	// AccessTokenType is the type of the OIDC access token (e.g., "access_token" or "id_token")
+	AccessTokenType string `json:"-"`
+
+	// OpenIDScope is the OIDC scope
+	OpenIDScope string `json:"-"`
 }
 
 // AuthScope allows a created token to be limited to a specific domain or project.

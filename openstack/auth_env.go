@@ -48,6 +48,14 @@ func AuthOptionsFromEnv() (gophercloud.AuthOptions, error) {
 	applicationCredentialSecret := os.Getenv("OS_APPLICATION_CREDENTIAL_SECRET")
 	systemScope := os.Getenv("OS_SYSTEM_SCOPE")
 
+	identityProvider := os.Getenv("OS_IDENTITY_PROVIDER")
+	protocol := os.Getenv("OS_PROTOCOL")
+	discoveryEndpoint := os.Getenv("OS_DISCOVERY_ENDPOINT")
+	clientID := os.Getenv("OS_CLIENT_ID")
+	clientSecret := os.Getenv("OS_CLIENT_SECRET")
+	accessTokenType := os.Getenv("OS_ACCESS_TOKEN_TYPE")
+	openidScope := os.Getenv("OS_OPENID_SCOPE")
+
 	// If OS_PROJECT_ID is set, overwrite tenantID with the value.
 	if v := os.Getenv("OS_PROJECT_ID"); v != "" {
 		tenantID = v
@@ -67,7 +75,8 @@ func AuthOptionsFromEnv() (gophercloud.AuthOptions, error) {
 
 	if userID == "" && username == "" {
 		// Empty username and userID could be ignored, when applicationCredentialID and applicationCredentialSecret are set
-		if applicationCredentialID == "" && applicationCredentialSecret == "" {
+		// or when OIDC Client Credentials are used
+		if applicationCredentialID == "" && applicationCredentialSecret == "" && clientID == "" {
 			err := gophercloud.ErrMissingAnyoneOfEnvironmentVariables{
 				EnvironmentVariables: []string{"OS_USERID", "OS_USERNAME"},
 			}
@@ -75,7 +84,7 @@ func AuthOptionsFromEnv() (gophercloud.AuthOptions, error) {
 		}
 	}
 
-	if password == "" && passcode == "" && applicationCredentialID == "" && applicationCredentialName == "" {
+	if password == "" && passcode == "" && applicationCredentialID == "" && applicationCredentialName == "" && clientID == "" {
 		err := gophercloud.ErrMissingEnvironmentVariable{
 			// silently ignore TOTP passcode warning, since it is not a common auth method
 			EnvironmentVariable: "OS_PASSWORD",
@@ -131,6 +140,13 @@ func AuthOptionsFromEnv() (gophercloud.AuthOptions, error) {
 		ApplicationCredentialName:   applicationCredentialName,
 		ApplicationCredentialSecret: applicationCredentialSecret,
 		Scope:                       scope,
+		IdentityProvider:            identityProvider,
+		Protocol:                    protocol,
+		DiscoveryEndpoint:           discoveryEndpoint,
+		ClientID:                    clientID,
+		ClientSecret:                clientSecret,
+		AccessTokenType:             accessTokenType,
+		OpenIDScope:                 openidScope,
 	}
 
 	return ao, nil

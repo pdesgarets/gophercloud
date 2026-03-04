@@ -61,6 +61,62 @@ func TestAuthenticatedClientV3(t *testing.T) {
 	th.CheckEquals(t, ID, client.TokenID)
 }
 
+func TestAuthenticatedClientOIDC(t *testing.T) {
+	fakeServer := th.SetupHTTP()
+	defer fakeServer.Teardown()
+
+	fakeServer.Mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, `
+			{
+				"versions": {
+					"values": [
+						{
+							"status": "stable",
+							"id": "v3.0",
+							"links": [
+								{ "href": "%s", "rel": "self" }
+							]
+						}
+					]
+				}
+			}
+		`, fakeServer.Endpoint()+"v3/")
+	})
+
+	// Mock OIDC Discovery
+	fakeServer.Mux.HandleFunc("/.well-known/openid-configuration", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		fmt.Fprintf(w, `{"token_endpoint": "%stoken"}`, fakeServer.Endpoint())
+	})
+
+	// Mock OIDC Token
+	fakeServer.Mux.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		fmt.Fprint(w, `{"access_token": "oidc-access-token"}`)
+	})
+
+	// Mock Keystone Federated Auth
+	fakeServer.Mux.HandleFunc("/v3/auth/OS-FEDERATION/identity_providers/my-idp/protocols/openid/auth", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("X-Subject-Token", "keystone-token")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		fmt.Fprint(w, `{"token": {"expires_at": "2014-10-02T13:45:00.000000Z", "catalog": []}}`)
+	})
+
+	options := gophercloud.AuthOptions{
+		IdentityEndpoint:  fakeServer.Endpoint() + "v3/",
+		IdentityProvider:  "my-idp",
+		Protocol:          "openid",
+		DiscoveryEndpoint: fakeServer.Endpoint() + ".well-known/openid-configuration",
+		ClientID:          "my-client",
+		ClientSecret:      "my-secret",
+	}
+
+	client, err := openstack.AuthenticatedClient(context.TODO(), options)
+	th.AssertNoErr(t, err)
+	th.AssertEquals(t, "keystone-token", client.TokenID)
+}
+
 func TestAuthenticatedClientV2(t *testing.T) {
 	fakeServer := th.SetupHTTP()
 	defer fakeServer.Teardown()

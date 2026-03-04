@@ -42,6 +42,27 @@ type Cloud struct {
 	// ClientKeyFile a path to a client key to use as part of the SSL
 	// transaction.
 	ClientKeyFile string `yaml:"key,omitempty" json:"key,omitempty"`
+
+	// IdentityProvider is the name of the identity provider for federated auth
+	IdentityProvider string `yaml:"identity_provider,omitempty" json:"identity_provider,omitempty"`
+
+	// Protocol is the federation protocol (e.g., "openid")
+	Protocol string `yaml:"protocol,omitempty" json:"protocol,omitempty"`
+
+	// DiscoveryEndpoint is the OIDC discovery endpoint
+	DiscoveryEndpoint string `yaml:"discovery_endpoint,omitempty" json:"discovery_endpoint,omitempty"`
+
+	// ClientID is the OIDC client ID
+	ClientID string `yaml:"client_id,omitempty" json:"client_id,omitempty"`
+
+	// ClientSecret is the OIDC client secret
+	ClientSecret string `yaml:"client_secret,omitempty" json:"client_secret,omitempty"`
+
+	// AccessTokenType is the type of the OIDC access token (e.g., "access_token" or "id_token")
+	AccessTokenType string `yaml:"access_token_type,omitempty" json:"access_token_type,omitempty"`
+
+	// OpenIDScope is the OIDC scope
+	OpenIDScope string `yaml:"openid_scope,omitempty" json:"openid_scope,omitempty"`
 }
 
 // AuthInfo represents the auth section of a cloud entry or
@@ -132,6 +153,27 @@ type AuthInfo struct {
 	// false, it will not cache these settings, but re-authentication will not be
 	// possible.  This setting defaults to false.
 	AllowReauth bool `yaml:"allow_reauth,omitempty" json:"allow_reauth,omitempty"`
+
+	// IdentityProvider is the name of the identity provider for federated auth
+	IdentityProvider string `yaml:"identity_provider,omitempty" json:"identity_provider,omitempty"`
+
+	// Protocol is the federation protocol (e.g., "openid")
+	Protocol string `yaml:"protocol,omitempty" json:"protocol,omitempty"`
+
+	// DiscoveryEndpoint is the OIDC discovery endpoint
+	DiscoveryEndpoint string `yaml:"discovery_endpoint,omitempty" json:"discovery_endpoint,omitempty"`
+
+	// ClientID is the OIDC client ID
+	ClientID string `yaml:"client_id,omitempty" json:"client_id,omitempty"`
+
+	// ClientSecret is the OIDC client secret
+	ClientSecret string `yaml:"client_secret,omitempty" json:"client_secret,omitempty"`
+
+	// AccessTokenType is the type of the OIDC access token (e.g., "access_token" or "id_token")
+	AccessTokenType string `yaml:"access_token_type,omitempty" json:"access_token_type,omitempty"`
+
+	// OpenIDScope is the OIDC scope
+	OpenIDScope string `yaml:"openid_scope,omitempty" json:"openid_scope,omitempty"`
 }
 
 // Region represents a region included as part of cloud in clouds.yaml
@@ -203,4 +245,7 @@ const (
 
 	// AuthV3ApplicationCredential defines version 3 of the application credential
 	AuthV3ApplicationCredential AuthType = "v3applicationcredential"
+
+	// AuthV3OIDCClientCredentials defines version 3 of the OIDC client credentials
+	AuthV3OIDCClientCredentials AuthType = "v3oidcclientcredentials"
 )

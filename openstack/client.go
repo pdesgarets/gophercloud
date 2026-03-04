@@ -11,6 +11,7 @@ import (
 	tokens2 "github.com/gophercloud/gophercloud/v2/openstack/identity/v2/tokens"
 	"github.com/gophercloud/gophercloud/v2/openstack/identity/v3/ec2tokens"
 	"github.com/gophercloud/gophercloud/v2/openstack/identity/v3/oauth1"
+	"github.com/gophercloud/gophercloud/v2/openstack/identity/v3/oidc"
 	tokens3 "github.com/gophercloud/gophercloud/v2/openstack/identity/v3/tokens"
 	"github.com/gophercloud/gophercloud/v2/openstack/utils"
 )
@@ -175,6 +176,12 @@ func AuthenticateV3(ctx context.Context, client *gophercloud.ProviderClient, opt
 }
 
 func v3auth(ctx context.Context, client *gophercloud.ProviderClient, endpoint string, opts tokens3.AuthOptionsBuilder, eo gophercloud.EndpointOpts) error {
+	if gOpts, ok := opts.(*gophercloud.AuthOptions); ok {
+		if gOpts.ClientID != "" && gOpts.DiscoveryEndpoint != "" {
+			return oidc.Authenticate(ctx, client, *gOpts)
+		}
+	}
+
 	// Override the generated service endpoint with the one returned by the version endpoint.
 	v3Client, err := NewIdentityV3(client, eo)
 	if err != nil {
